@@ -1,6 +1,4 @@
 
-
-
 #include <windows.h>
 
 bool Running = true;
