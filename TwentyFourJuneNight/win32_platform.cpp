@@ -27,7 +27,11 @@ internal void Win32ResizeDIBSection(int Width, int Height)
 	{
 		DeleteObject(BitmapHandle);
 	}
-	else {
+	
+	if (BitmapDeviceContext)
+	{
+		// TODO(SJtheSahilJoseph): Should we recreate these under certain special circumstances.
+
 		BitmapDeviceContext = CreateCompatibleDC(0);
 	}
 
