@@ -1,7 +1,13 @@
 
 #include <windows.h>
 
-bool Running = true;
+#define internal static
+#define local_persist static
+#define global_variable static
+
+
+// TODO(SJtheSahilJoseph): This is global variable for now.
+global_variable bool Running = true;
 
 LRESULT CALLBACK main_window_callback(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 {
@@ -30,7 +36,7 @@ LRESULT CALLBACK main_window_callback(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM
 		int X = paint.rcPaint.left;
 		int Y = paint.rcPaint.top;
 
-		static DWORD Operation = WHITENESS;
+		local_persist DWORD Operation = WHITENESS;
 
 		PatBlt(DeviceContext, X, Y, width, height, Operation);
 
@@ -50,14 +56,14 @@ LRESULT CALLBACK main_window_callback(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM
 
 	case WM_DESTROY:
 	{
-		OutputDebugStringA("WM_DESTROY executed this.\n");
+		// TODO(SJtheSahilJoseph): Handle this as an error - recreate window?
 		Running = false;
 		PostQuitMessage(0);
 	} break;
 
 	case WM_CLOSE:
 	{
-		OutputDebugStringA("WM_CLOSE executed this.\n");
+		// TODO(SJtheSahilJoseph): Handle this with a message to the user?
 		Running = false;
 		DestroyWindow(hWnd);
 	} break;
@@ -103,8 +109,10 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 
 		if (window_handle)
 		{
-
 			MSG Msg;
+			
+			Running = true;
+
 			while (Running)
 			{
 				BOOL message_result = GetMessage(&Msg, 0, 0, 0);
@@ -114,13 +122,16 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 					TranslateMessage(&Msg);
 					DispatchMessage(&Msg);
 				}
+			
 				else
 				{
 					Running = false;
 				}
+
 			}
 
 		}
+		
 		else
 		{
 			OutputDebugStringA("Error: window_handle.\n");
