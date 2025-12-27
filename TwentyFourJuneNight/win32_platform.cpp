@@ -5,11 +5,58 @@
 #define local_persist static
 #define global_variable static
 
-
 // TODO(SJtheSahilJoseph): This is global variable for now.
 global_variable bool Running = true;
 
-LRESULT CALLBACK main_window_callback(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
+global_variable BITMAPINFO BitmapInfo;
+
+global_variable void* BitmapMemory;
+
+global_variable HBITMAP BitmapHandle;
+
+global_variable HDC BitmapDeviceContext;
+
+internal void Win32ResizeDIBSection(int Width, int Height)
+{
+
+	// TODO(SJtheSahilJoseph): Bulletproof this.
+	// Maybe don't free first, Free after, then free first if that fails.
+
+	// TODO(SJtheSahilJoseph): Free our DIBSection.
+	if (BitmapHandle)
+	{
+		DeleteObject(BitmapHandle);
+	}
+	else {
+		BitmapDeviceContext = CreateCompatibleDC(0);
+	}
+
+	BitmapInfo.bmiHeader.biSize = sizeof(BitmapInfo.bmiHeader);
+	BitmapInfo.bmiHeader.biWidth = Width;
+	BitmapInfo.bmiHeader.biHeight = Height;
+	BitmapInfo.bmiHeader.biPlanes = 1;
+	BitmapInfo.bmiHeader.biBitCount = 32;
+	BitmapInfo.bmiHeader.biCompression = BI_RGB;
+	BitmapInfo.bmiHeader.biSizeImage = 0;
+	BitmapInfo.bmiHeader.biXPelsPerMeter = 0;
+	BitmapInfo.bmiHeader.biYPelsPerMeter = 0;
+	BitmapInfo.bmiHeader.biClrUsed = 0;
+	BitmapInfo.bmiHeader.biClrImportant = 0;
+
+	HBITMAP BitmapHandle = CreateDIBSection(BitmapDeviceContext, &BitmapInfo, DIB_RGB_COLORS,
+							 &BitmapMemory, NULL, NULL);
+
+}
+
+internal void
+Win32UpdateWindow(HDC DeviceContext, int X, int Y, int Width, int Height)
+{
+	StretchDIBits(DeviceContext, X, Y, Width, Height, X, Y, Width, Height,
+			  		  BitmapMemory, &BitmapInfo, DIB_RGB_COLORS, SRCCOPY);
+}
+
+
+LRESULT CALLBACK Win32MainWindowCallback(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 {
 
 	LRESULT result = 0;
@@ -19,39 +66,35 @@ LRESULT CALLBACK main_window_callback(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM
 
 	case WM_SIZE:
 	{
-		OutputDebugStringA("WM_SIZE executed this.\n");
+		RECT ClientRect;
+		GetClientRect(hWnd, &ClientRect);
+
+		LONG Width = ClientRect.right - ClientRect.left;
+		LONG Height = ClientRect.bottom - ClientRect.top;
+
+		Win32ResizeDIBSection(Width, Height);
 	} break;
 
 	case WM_PAINT:
 	{
-		OutputDebugStringA("WM_PAINT executed this.\n");
-
 		PAINTSTRUCT paint;
 
 		HDC DeviceContext = BeginPaint(hWnd, &paint);
 
-		LONG width = paint.rcPaint.right - paint.rcPaint.left;
-		LONG height = paint.rcPaint.bottom - paint.rcPaint.top;
+
+		LONG Width = paint.rcPaint.right - paint.rcPaint.left;
+		LONG Height = paint.rcPaint.bottom - paint.rcPaint.top;
 
 		int X = paint.rcPaint.left;
 		int Y = paint.rcPaint.top;
 
+		Win32UpdateWindow(DeviceContext, X, Y, Width, Height);
+
 		local_persist DWORD Operation = WHITENESS;
 
-		PatBlt(DeviceContext, X, Y, width, height, Operation);
-
-		if (Operation == WHITENESS)
-		{
-			Operation = BLACKNESS;
-		}
-		else
-		{
-			Operation = WHITENESS;
-		}
+		PatBlt(DeviceContext, X, Y, Width, Height, Operation);
 
 		EndPaint(hWnd, &paint);
-
-
 	} break;
 
 	case WM_DESTROY:
@@ -88,7 +131,7 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 
 	WNDCLASSA window_class = {};
 	window_class.style = CS_OWNDC | CS_HREDRAW | CS_VREDRAW;
-	window_class.lpfnWndProc = main_window_callback;
+	window_class.lpfnWndProc = Win32MainWindowCallback;
 	window_class.hInstance = hInstance;
 	window_class.hIcon = 0;
 	window_class.hCursor = 0;
@@ -110,7 +153,7 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 		if (window_handle)
 		{
 			MSG Msg;
-			
+
 			Running = true;
 
 			while (Running)
@@ -122,7 +165,7 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 					TranslateMessage(&Msg);
 					DispatchMessage(&Msg);
 				}
-			
+
 				else
 				{
 					Running = false;
@@ -131,7 +174,7 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 			}
 
 		}
-		
+
 		else
 		{
 			OutputDebugStringA("Error: window_handle.\n");
