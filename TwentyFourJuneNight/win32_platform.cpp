@@ -12,6 +12,9 @@ global_variable BITMAPINFO BitmapInfo;
 
 global_variable void* BitmapMemory;
 
+global_variable int BitmapWidth;
+global_variable int BitmapHeight;
+
 internal void Win32ResizeDIBSection(int Width, int Height)
 {
 
@@ -20,9 +23,12 @@ internal void Win32ResizeDIBSection(int Width, int Height)
 		VirtualFree(BitmapMemory, 0, MEM_RELEASE);
 	}
 
+	BitmapWidth = Width;
+	BitmapHeight = Height;
+
 	BitmapInfo.bmiHeader.biSize = sizeof(BitmapInfo.bmiHeader);
-	BitmapInfo.bmiHeader.biWidth = Width;
-	BitmapInfo.bmiHeader.biHeight = Height;
+	BitmapInfo.bmiHeader.biWidth = BitmapWidth;
+	BitmapInfo.bmiHeader.biHeight = -BitmapHeight;
 	BitmapInfo.bmiHeader.biPlanes = 1;
 	BitmapInfo.bmiHeader.biBitCount = 32;
 	BitmapInfo.bmiHeader.biCompression = BI_RGB;
@@ -34,17 +40,25 @@ internal void Win32ResizeDIBSection(int Width, int Height)
 
 	int BytesPerPixel = 4;
 
-	int BitmapMemorySize = ((Width * Height) * BytesPerPixel);
+	int BitmapMemorySize = ((BitmapWidth * BitmapHeight) * BytesPerPixel);
 
 	BitmapMemory = VirtualAlloc(0, BitmapMemorySize, MEM_COMMIT, PAGE_READWRITE);
 
 }
 
 internal void
-Win32UpdateWindow(HDC DeviceContext, int X, int Y, int Width, int Height)
+Win32UpdateWindow(HDC DeviceContext, RECT* WindowRect, int X, int Y, int Width, int Height)
 {
-	StretchDIBits(DeviceContext, X, Y, Width, Height, X, Y, Width, Height,
-			  		  BitmapMemory, &BitmapInfo, DIB_RGB_COLORS, SRCCOPY);
+
+	int WindowWidth = WindowRect->right - WindowRect->left;
+	int WindowHeight = WindowRect->bottom - WindowRect->top;
+
+	StretchDIBits(DeviceContext, 
+		//X, Y, Width, Height,
+		// X, Y, Width, Height,
+		0, 0, BitmapWidth, BitmapHeight,
+		0, 0, WindowWidth, WindowHeight,
+		BitmapMemory, &BitmapInfo, DIB_RGB_COLORS, SRCCOPY);
 }
 
 
@@ -80,11 +94,10 @@ LRESULT CALLBACK Win32MainWindowCallback(HWND hWnd, UINT Msg, WPARAM wParam, LPA
 		int X = paint.rcPaint.left;
 		int Y = paint.rcPaint.top;
 
-		Win32UpdateWindow(DeviceContext, X, Y, Width, Height);
+		RECT ClientRect;
+		GetClientRect(hWnd, &ClientRect);
 
-		local_persist DWORD Operation = WHITENESS;
-
-		PatBlt(DeviceContext, X, Y, Width, Height, Operation);
+		Win32UpdateWindow(DeviceContext, &ClientRect, X, Y, Width, Height);
 
 		EndPaint(hWnd, &paint);
 	} break;
