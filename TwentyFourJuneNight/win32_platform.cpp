@@ -12,27 +12,12 @@ global_variable BITMAPINFO BitmapInfo;
 
 global_variable void* BitmapMemory;
 
-global_variable HBITMAP BitmapHandle;
-
-global_variable HDC BitmapDeviceContext;
-
 internal void Win32ResizeDIBSection(int Width, int Height)
 {
 
-	// TODO(SJtheSahilJoseph): Bulletproof this.
-	// Maybe don't free first, Free after, then free first if that fails.
-
-	// TODO(SJtheSahilJoseph): Free our DIBSection.
-	if (BitmapHandle)
+	if (BitmapMemory)
 	{
-		DeleteObject(BitmapHandle);
-	}
-	
-	if (!BitmapDeviceContext)
-	{
-		// TODO(SJtheSahilJoseph): Should we recreate these under certain special circumstances.
-
-		BitmapDeviceContext = CreateCompatibleDC(0);
+		VirtualFree(BitmapMemory, 0, MEM_RELEASE);
 	}
 
 	BitmapInfo.bmiHeader.biSize = sizeof(BitmapInfo.bmiHeader);
@@ -47,8 +32,11 @@ internal void Win32ResizeDIBSection(int Width, int Height)
 	BitmapInfo.bmiHeader.biClrUsed = 0;
 	BitmapInfo.bmiHeader.biClrImportant = 0;
 
-	HBITMAP BitmapHandle = CreateDIBSection(BitmapDeviceContext, &BitmapInfo, DIB_RGB_COLORS,
-							 &BitmapMemory, NULL, NULL);
+	int BytesPerPixel = 4;
+
+	int BitmapMemorySize = ((Width * Height) * BytesPerPixel);
+
+	BitmapMemory = VirtualAlloc(0, BitmapMemorySize, MEM_COMMIT, PAGE_READWRITE);
 
 }
 
