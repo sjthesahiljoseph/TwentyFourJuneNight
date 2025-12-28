@@ -30,7 +30,7 @@ global_variable int BitmapHeight;
 global_variable int BytesPerPixel = 4;
 
 internal void
-RenderWeirdGradient(int XOffset, int YOffset)
+RenderWeirdGradient(int BlueOffset, int GreenOffset)
 {
 
 	int Width = BitmapWidth;
@@ -48,8 +48,8 @@ RenderWeirdGradient(int XOffset, int YOffset)
 		for (int X = 0; X < BitmapWidth; X++)
 		{
 
-			uint8 Blue = (X + XOffset);
-			uint8 Green = (Y + YOffset);
+			uint8 Blue = (X + BlueOffset);
+			uint8 Green = (Y + GreenOffset);
 			uint8 Red = 0;
 
 			*Pixel++ = ((Green << 8) | Blue);
