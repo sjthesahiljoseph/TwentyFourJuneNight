@@ -68,13 +68,13 @@ internal void Win32ResizeDIBSection(int Width, int Height)
 		for (int X = 0; X < BitmapWidth; X++)
 		{
 
+			*Pixel = 0;
+			Pixel++;
+
+			*Pixel = 0;
+			Pixel++;
+
 			*Pixel = 255;
-			Pixel++;
-
-			*Pixel = 0;
-			Pixel++;
-
-			*Pixel = 0;
 			Pixel++;
 
 			*Pixel = 0;
