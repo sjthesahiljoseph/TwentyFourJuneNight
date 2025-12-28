@@ -93,16 +93,17 @@ internal void Win32ResizeDIBSection(int Width, int Height)
 
 	BitmapMemory = VirtualAlloc(0, BitmapMemorySize, MEM_COMMIT, PAGE_READWRITE);
 
-	RenderWeirdGradient(0, 0);
+
+	// TODO(SJtheSahilJoseph): Probably wanna clear this to black.
 
 }
 
 internal void
-Win32UpdateWindow(HDC DeviceContext, RECT* WindowRect, int X, int Y, int Width, int Height)
+Win32UpdateWindow(HDC DeviceContext, RECT* ClientRect, int X, int Y, int Width, int Height)
 {
 
-	int WindowWidth = WindowRect->right - WindowRect->left;
-	int WindowHeight = WindowRect->bottom - WindowRect->top;
+	int WindowWidth = ClientRect->right - ClientRect->left;
+	int WindowHeight = ClientRect->bottom - ClientRect->top;
 
 	StretchDIBits(DeviceContext, 
 		//X, Y, Width, Height,
@@ -197,7 +198,7 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 	if (RegisterClassA(&window_class))
 	{
 
-		HWND window_handle = CreateWindowExA(
+		HWND Window = CreateWindowExA(
 			0,
 			window_class.lpszClassName,
 			window_class.lpszClassName,
@@ -206,26 +207,45 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 			0, 0, hInstance, 0
 		);
 
-		if (window_handle)
+		if (Window)
 		{
 			MSG Msg;
 
 			Running = true;
 
+			int XOffset = 0;
+			int YOffset = 0;
+
 			while (Running)
 			{
-				BOOL message_result = GetMessage(&Msg, 0, 0, 0);
 
-				if (message_result > 0)
+				while (PeekMessage(&Msg, 0, 0, 0, PM_REMOVE))
 				{
+
+					if (Msg.message == WM_QUIT)
+					{
+						Running = false;
+					}
+
 					TranslateMessage(&Msg);
 					DispatchMessage(&Msg);
 				}
 
-				else
-				{
-					Running = false;
-				}
+				RenderWeirdGradient(XOffset, YOffset);
+
+				HDC DeviceContext = GetDC(Window);
+
+				RECT ClientRect;
+				GetClientRect(Window, &ClientRect);
+				
+				int WindowWidth = ClientRect.right - ClientRect.left;
+				int WindowHeight = ClientRect.bottom - ClientRect.top;
+
+				Win32UpdateWindow(DeviceContext, &ClientRect, 0, 0, WindowWidth, WindowHeight);
+
+				ReleaseDC(Window, DeviceContext);
+
+				XOffset++;
 
 			}
 
