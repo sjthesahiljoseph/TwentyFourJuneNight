@@ -120,6 +120,8 @@ internal void
 Win32DisplayBufferInWindow(HDC DeviceContext, int WindowWidth, int WindowHeight, win32_offscreen_buffer Buffer, int X, int Y, int Width, int Height)
 {
 
+	// TODO(SJtheSahilJoseph): Aspect Ratio Correction.
+
 	StretchDIBits(DeviceContext, 
 		//X, Y, Width, Height,
 		// X, Y, Width, Height,
