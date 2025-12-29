@@ -223,6 +223,10 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 
 		if (Window)
 		{
+			// NOTE(SJtheSahilJoseph): Since we specified CS_OWNDC, we can just get one device context and use it forever.
+			// Because we are not sharing it with anyone.
+			HDC DeviceContext = GetDC(Window);
+
 			MSG Msg;
 
 			Running = true;
@@ -246,8 +250,6 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 				}
 
 				RenderWeirdGradient(GlobalBackBuffer, XOffset, YOffset);
-
-				HDC DeviceContext = GetDC(Window);
 
 				win32_window_dimension Dimension = Win32GetWindowDimension(Window);
 
