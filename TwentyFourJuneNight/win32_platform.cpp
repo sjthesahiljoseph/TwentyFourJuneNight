@@ -118,7 +118,7 @@ internal void Win32ResizeDIBSection(win32_offscreen_buffer* Buffer, int Width, i
 }
 
 internal void
-Win32DisplayBufferInWindow(HDC DeviceContext, int WindowWidth, int WindowHeight, win32_offscreen_buffer Buffer, int X, int Y, int Width, int Height)
+Win32DisplayBufferInWindow(HDC DeviceContext, int WindowWidth, int WindowHeight, win32_offscreen_buffer Buffer)
 {
 
 	// TODO(SJtheSahilJoseph): Aspect Ratio Correction.
@@ -151,17 +151,10 @@ LRESULT CALLBACK Win32MainWindowCallback(HWND hWnd, UINT Msg, WPARAM wParam, LPA
 		PAINTSTRUCT paint;
 
 		HDC DeviceContext = BeginPaint(hWnd, &paint);
-
-
-		LONG Width = paint.rcPaint.right - paint.rcPaint.left;
-		LONG Height = paint.rcPaint.bottom - paint.rcPaint.top;
-
-		int X = paint.rcPaint.left;
-		int Y = paint.rcPaint.top;
-
+		
 		win32_window_dimension Dimension = Win32GetWindowDimension(hWnd);
 
-		Win32DisplayBufferInWindow(DeviceContext, Dimension.Width, Dimension.Height, GlobalBackBuffer, X, Y, Width, Height);
+		Win32DisplayBufferInWindow(DeviceContext, Dimension.Width, Dimension.Height, GlobalBackBuffer);
 
 		EndPaint(hWnd, &paint);
 	} break;
@@ -254,7 +247,7 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 
 				win32_window_dimension Dimension = Win32GetWindowDimension(Window);
 
-				Win32DisplayBufferInWindow(DeviceContext, Dimension.Width, Dimension.Height, GlobalBackBuffer, 0, 0, Dimension.Width, Dimension.Height);
+				Win32DisplayBufferInWindow(DeviceContext, Dimension.Width, Dimension.Height, GlobalBackBuffer);
 
 				ReleaseDC(Window, DeviceContext);
 
