@@ -1,6 +1,7 @@
 
 #include <windows.h>
 #include <stdint.h>
+#include <math.h>
 
 #define internal static
 #define local_persist static
@@ -54,6 +55,40 @@ win32_window_dimension Win32GetWindowDimension(HWND Window)
 
 	return Result;
 }
+internal void
+RenderHyperTunnel(win32_offscreen_buffer Buffer,
+	int XOffset,
+	int YOffset,
+	float Time)
+{
+	uint8* Row = (uint8*)Buffer.Memory;
+
+	float CX = Buffer.Width * 0.9f;
+	float CY = Buffer.Height * 0.9f;
+
+	for (int Y = 0; Y < Buffer.Height; Y++)
+	{
+		uint32* Pixel = (uint32*)Row;
+
+		for (int X = 0; X < Buffer.Width; X++)
+		{
+			float FX = (X + XOffset) - CX;
+			float FY = (Y + YOffset) - CY;
+
+			float Dist = sqrtf(FX * FX + FY * FY) + 0.001f;
+
+			float Speed = 30.0f;
+			float Z = 1.0f / (Dist * 0.05f);
+
+			uint8 C = (uint8)(255.0f * fmodf(Z + Time * Speed, 1.0f));
+
+			*Pixel++ = (C << 16) | (C << 8) | C;
+		}
+
+		Row += Buffer.Pitch;
+	}
+}
+
 
 internal void
 RenderWeirdGradient(win32_offscreen_buffer Buffer, int BlueOffset, int GreenOffset)
@@ -246,7 +281,8 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 					DispatchMessage(&Msg);
 				}
 
-				RenderWeirdGradient(GlobalBackBuffer, XOffset, YOffset);
+				//RenderWeirdGradient(GlobalBackBuffer, XOffset, YOffset);
+				RenderHyperTunnel(GlobalBackBuffer, XOffset, YOffset, 1000);
 
 				win32_window_dimension Dimension = Win32GetWindowDimension(Window);
 
