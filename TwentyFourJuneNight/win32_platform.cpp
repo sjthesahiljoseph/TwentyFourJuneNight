@@ -123,8 +123,8 @@ Win32DisplayBufferInWindow(HDC DeviceContext, int WindowWidth, int WindowHeight,
 	StretchDIBits(DeviceContext, 
 		//X, Y, Width, Height,
 		// X, Y, Width, Height,
-		0, 0, Buffer.Width, Buffer.Height,
 		0, 0, WindowWidth, WindowHeight,
+		0, 0, Buffer.Width, Buffer.Height,
 		Buffer.Memory, &Buffer.Info, DIB_RGB_COLORS, SRCCOPY);
 }
 
@@ -139,9 +139,7 @@ LRESULT CALLBACK Win32MainWindowCallback(HWND hWnd, UINT Msg, WPARAM wParam, LPA
 
 	case WM_SIZE:
 	{
-		win32_window_dimension Dimension = Win32GetWindowDimension(hWnd);
 
-		Win32ResizeDIBSection(&GlobalBackBuffer, Dimension.Width, Dimension.Height);
 	} break;
 
 	case WM_PAINT:
@@ -197,6 +195,9 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 {
 
 	WNDCLASSA window_class = {};
+
+	Win32ResizeDIBSection(&GlobalBackBuffer, 1280, 720);
+
 	window_class.style = CS_OWNDC | CS_HREDRAW | CS_VREDRAW;
 	window_class.lpfnWndProc = Win32MainWindowCallback;
 	window_class.hInstance = hInstance;
