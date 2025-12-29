@@ -18,6 +18,7 @@ typedef int64_t int64;
 
 struct win32_offscreen_buffer
 {
+	// NOTE(SJtheSahilJoseph): Pixels are always 32 bit wide. Memory Order: BB GG RR XX. Little Endian 0x XX RR GG BB.
 	BITMAPINFO Info;
 
 	void* Memory;
@@ -25,6 +26,8 @@ struct win32_offscreen_buffer
 	int Width;
 	int Height;
 	int Pitch;
+
+	// NOTE(SJtheSahilJoseph): I will use BytesPerPixel from here.
 	int BytesPerPixel;
 };
 
