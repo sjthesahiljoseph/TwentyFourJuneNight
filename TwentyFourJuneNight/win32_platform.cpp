@@ -122,6 +122,7 @@ Win32DisplayBufferInWindow(HDC DeviceContext, int WindowWidth, int WindowHeight,
 {
 
 	// TODO(SJtheSahilJoseph): Aspect Ratio Correction.
+	// TODO(SJtheSahilJoseph): Experiment with Stretch Modes.
 
 	StretchDIBits(DeviceContext, 
 		//X, Y, Width, Height,
