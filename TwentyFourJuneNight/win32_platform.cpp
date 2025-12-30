@@ -204,6 +204,57 @@ LRESULT CALLBACK Win32MainWindowCallback(HWND hWnd, UINT Msg, WPARAM wParam, LPA
 		PostQuitMessage(0);
 	} break;
 
+	case WM_SYSKEYDOWN:
+	case WM_SYSKEYUP:
+	case WM_KEYDOWN:
+	case WM_KEYUP:
+	{
+		uint32 VKeyCode = wParam;
+
+		if (VKeyCode == VK_UP)
+		{
+			
+		}
+		
+		else if (VKeyCode == VK_DOWN)
+		{
+			
+		}
+		
+		else if (VKeyCode == VK_LEFT)
+		{
+			
+		}
+		
+		else if (VKeyCode == VK_RIGHT)
+		{
+			
+		}
+		
+		else if (VKeyCode == 'Q')
+		{
+			
+		}
+		
+		else if (VKeyCode == 'E')
+		{
+			
+		}
+
+		else if (VKeyCode == VK_ESCAPE)
+		{
+			
+		}
+
+		else if (VKeyCode == VK_SPACE)
+		{
+			
+		}
+
+		//lParam & (1 << 30);
+
+	} break;
+
 	case WM_CLOSE:
 	{
 		// TODO(SJtheSahilJoseph): Handle this with a message to the user?
