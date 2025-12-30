@@ -43,6 +43,15 @@ struct win32_window_dimension
 	int Height;
 };
 
+typedef DWORD WINAPI x_input_get_state(DWORD dwUserIndex, XINPUT_STATE* pState);
+typedef DWORD WINAPI x_input_set_state(DWORD dwUserIndex, XINPUT_VIBRATION* pVibration);
+
+global_variable x_input_get_state* XInputGetState_;
+global_variable x_input_set_state* XInputSetState_;
+
+#define XInputGetState XInputGetState_
+#define XInputSetState XInputSetState_
+
 win32_window_dimension Win32GetWindowDimension(HWND Window)
 {
 	win32_window_dimension Result;
