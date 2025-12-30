@@ -1,7 +1,7 @@
 
 #include <windows.h>
 #include <stdint.h>
-#include <math.h>
+#include <xinput.h>
 
 #define internal static
 #define local_persist static
@@ -247,6 +247,45 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 					DispatchMessage(&Msg);
 				}
 
+				// TODO(SJtheSahilJoseph): Should we pull this more frequently.
+				DWORD dwResult;
+				for (DWORD ControllerIndex = 0; ControllerIndex < XUSER_MAX_COUNT; ControllerIndex++)
+				{
+					XINPUT_STATE ControllerState;
+
+					ZeroMemory(&ControllerState, sizeof(XINPUT_STATE));
+
+					dwResult = XInputGetState(ControllerIndex, &ControllerState);
+
+					if (dwResult == ERROR_SUCCESS)
+					{
+						XINPUT_GAMEPAD* Pad = &ControllerState.Gamepad;
+
+						bool Up = (Pad->wButtons & XINPUT_GAMEPAD_DPAD_UP);
+						bool Down = (Pad->wButtons & XINPUT_GAMEPAD_DPAD_DOWN);
+						bool Left = (Pad->wButtons & XINPUT_GAMEPAD_DPAD_LEFT);
+						bool Right = (Pad->wButtons & XINPUT_GAMEPAD_DPAD_RIGHT);
+						bool Start = (Pad->wButtons & XINPUT_GAMEPAD_START);
+						bool Back = (Pad->wButtons & XINPUT_GAMEPAD_BACK);
+						bool LeftThumb = (Pad->wButtons & XINPUT_GAMEPAD_LEFT_THUMB);
+						bool RightThumb = (Pad->wButtons & XINPUT_GAMEPAD_RIGHT_THUMB);
+						bool LeftShoulder = (Pad->wButtons & XINPUT_GAMEPAD_LEFT_SHOULDER);
+						bool RightShoulder = (Pad->wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER);
+						bool AButton = (Pad->wButtons & XINPUT_GAMEPAD_A);
+						bool BButton = (Pad->wButtons & XINPUT_GAMEPAD_B);
+						bool XButton = (Pad->wButtons & XINPUT_GAMEPAD_X);
+						bool YButton = (Pad->wButtons & XINPUT_GAMEPAD_Y);
+
+						int16 StickLX = Pad->sThumbLX;
+						int16 StickLY = Pad->sThumbLY;
+						int16 StickRX = Pad->sThumbRX;
+						int16 StickRY = Pad->sThumbRY;
+					}
+					else
+					{
+						// Controller is not connected
+					}
+				}
 				RenderWeirdGradient(GlobalBackBuffer, XOffset, YOffset);
 
 				win32_window_dimension Dimension = Win32GetWindowDimension(Window);
