@@ -316,6 +316,11 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 						int16 StickLY = Pad->sThumbLY;
 						int16 StickRX = Pad->sThumbRX;
 						int16 StickRY = Pad->sThumbRY;
+
+						if (Up)
+						{
+							YOffset++;
+						}
 					}
 					else
 					{
@@ -331,8 +336,6 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 				ReleaseDC(Window, DeviceContext);
 
 				XOffset++;
-				YOffset++;
-
 			}
 
 		}
