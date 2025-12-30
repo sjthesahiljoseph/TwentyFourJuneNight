@@ -63,7 +63,21 @@ X_INPUT_SET_STATE(XInputSetStateStub)
 global_variable x_input_set_state* XInputSetState_ = XInputSetStateStub;
 #define XInputSetState XInputSetState_
 
-win32_window_dimension Win32GetWindowDimension(HWND Window)
+internal void
+Win32LoadXInput(void)
+{
+	HMODULE XInputLibrary = LoadLibraryA("xinput1_3.dll");
+
+	if (XInputLibrary)
+	{
+		XInputGetState = (x_input_get_state *)GetProcAddress(XInputLibrary, "XInputGetState");
+		XInputSetState = (x_input_set_state * )GetProcAddress(XInputLibrary, "XInputSetState");
+	}
+
+}
+
+internal win32_window_dimension
+Win32GetWindowDimension(HWND Window)
 {
 	win32_window_dimension Result;
 
@@ -214,6 +228,8 @@ LRESULT CALLBACK Win32MainWindowCallback(HWND hWnd, UINT Msg, WPARAM wParam, LPA
 
 int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd)
 {
+
+	Win32LoadXInput();
 
 	WNDCLASSA window_class = {};
 
