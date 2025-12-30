@@ -37,6 +37,10 @@ global_variable bool Running = true;
 
 global_variable win32_offscreen_buffer GlobalBackBuffer;
 
+// TODO(SJtheSahilJoseph): Just experimenting thing.
+global_variable int XOffset;
+global_variable int YOffset;
+
 struct win32_window_dimension
 {
 	int Width;
@@ -216,22 +220,30 @@ LRESULT CALLBACK Win32MainWindowCallback(HWND hWnd, UINT Msg, WPARAM wParam, LPA
 
 		if (VKeyCode == VK_UP)
 		{
-			
+			if (IsDown) {
+				YOffset += 20;
+			}
 		}
 		
 		else if (VKeyCode == VK_DOWN)
 		{
-			
+			if (IsDown) {
+			YOffset -= 20;
+			}
 		}
 		
 		else if (VKeyCode == VK_LEFT)
 		{
-			
+			if (IsDown) {
+			XOffset += 20;
+			}
 		}
 		
 		else if (VKeyCode == VK_RIGHT)
 		{
-			
+			if (IsDown) {
+			XOffset -= 20;
+			}
 		}
 		
 		else if (VKeyCode == 'Q')
@@ -325,8 +337,9 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 
 			Running = true;
 
-			int XOffset = 0;
-			int YOffset = 0;
+			// TODO(SJtheSahilJoseph): I'm now creating globals to experiment.
+			//int XOffset = 0;
+			//int YOffset = 0;
 
 			while (Running)
 			{
@@ -377,10 +390,7 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 						int16 StickRX = Pad->sThumbRX;
 						int16 StickRY = Pad->sThumbRY;
 
-						if (Up)
-						{
-							YOffset++;
-						}
+						
 					}
 					else
 					{
@@ -395,7 +405,6 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 
 				ReleaseDC(Window, DeviceContext);
 
-				XOffset++;
 			}
 
 		}
