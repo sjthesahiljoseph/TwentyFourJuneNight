@@ -211,6 +211,9 @@ LRESULT CALLBACK Win32MainWindowCallback(HWND hWnd, UINT Msg, WPARAM wParam, LPA
 	{
 		uint32 VKeyCode = wParam;
 
+		bool WasDown = ((lParam & (1 << 30)) != 0);
+		bool IsDown = ((lParam & (1 << 31)) == 0);
+
 		if (VKeyCode == VK_UP)
 		{
 			
@@ -243,15 +246,21 @@ LRESULT CALLBACK Win32MainWindowCallback(HWND hWnd, UINT Msg, WPARAM wParam, LPA
 
 		else if (VKeyCode == VK_ESCAPE)
 		{
-			
+			if (IsDown)
+			{
+				Running = false;
+			}
+
+			if (WasDown)
+			{
+				Running = false;
+			}
 		}
 
 		else if (VKeyCode == VK_SPACE)
 		{
 			
 		}
-
-		//lParam & (1 << 30);
 
 	} break;
 
