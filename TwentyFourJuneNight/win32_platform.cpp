@@ -43,29 +43,24 @@ struct win32_window_dimension
 	int Height;
 };
 
+// NOTE(SJtheSahilJoseph): XInputGetState
 #define X_INPUT_GET_STATE(name) DWORD WINAPI name(DWORD dwUserIndex, XINPUT_STATE* pState)
-#define X_INPUT_SET_STATE(name) DWORD WINAPI name(DWORD dwUserIndex, XINPUT_VIBRATION* pVibration)
-
 typedef X_INPUT_GET_STATE(x_input_get_state);
-typedef X_INPUT_SET_STATE(x_input_set_state);
-
 X_INPUT_GET_STATE(XInputGetStateStub)
 {
 	return 0;
 }
+global_variable x_input_get_state* XInputGetState_ = XInputGetStateStub;
+#define XInputGetState XInputGetState_
 
+// NOTE(SJtheSahilJoseph): XInputSetState
+#define X_INPUT_SET_STATE(name) DWORD WINAPI name(DWORD dwUserIndex, XINPUT_VIBRATION* pVibration)
+typedef X_INPUT_SET_STATE(x_input_set_state);
 X_INPUT_SET_STATE(XInputSetStateStub)
 {
 	return 0;
 }
-
-//typedef DWORD WINAPI x_input_get_state(DWORD dwUserIndex, XINPUT_STATE* pState);
-//typedef DWORD WINAPI x_input_set_state(DWORD dwUserIndex, XINPUT_VIBRATION* pVibration);
-
-global_variable x_input_get_state* XInputGetState_ = XInputGetStateStub;
 global_variable x_input_set_state* XInputSetState_ = XInputSetStateStub;
-
-#define XInputGetState XInputGetState_
 #define XInputSetState XInputSetState_
 
 win32_window_dimension Win32GetWindowDimension(HWND Window)
