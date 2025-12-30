@@ -91,18 +91,18 @@ Win32GetWindowDimension(HWND Window)
 }
 
 internal void
-RenderWeirdGradient(win32_offscreen_buffer Buffer, int BlueOffset, int GreenOffset)
+RenderWeirdGradient(win32_offscreen_buffer* Buffer, int BlueOffset, int GreenOffset)
 {
 	// TODO(SJtheSahilJoseph): Pass by Value or Pass by Address? Buffer or *Buffer?
 
-	uint8* Row = (uint8*)Buffer.Memory;
+	uint8* Row = (uint8*)Buffer->Memory;
 
-	for (int Y = 0; Y < Buffer.Height; Y++)
+	for (int Y = 0; Y < Buffer->Height; Y++)
 	{
 
 		uint32* Pixel = (uint32*)Row;
 
-		for (int X = 0; X < Buffer.Width; X++)
+		for (int X = 0; X < Buffer->Width; X++)
 		{
 
 			uint8 Blue = (X + BlueOffset);
@@ -113,7 +113,7 @@ RenderWeirdGradient(win32_offscreen_buffer Buffer, int BlueOffset, int GreenOffs
 
 		}
 
-		Row += Buffer.Pitch;
+		Row += Buffer->Pitch;
 	}
 
 }
@@ -156,7 +156,7 @@ internal void Win32ResizeDIBSection(win32_offscreen_buffer* Buffer, int Width, i
 }
 
 internal void
-Win32DisplayBufferInWindow(HDC DeviceContext, int WindowWidth, int WindowHeight, win32_offscreen_buffer Buffer)
+Win32DisplayBufferInWindow(win32_offscreen_buffer* Buffer, HDC DeviceContext, int WindowWidth, int WindowHeight)
 {
 
 	// TODO(SJtheSahilJoseph): Aspect Ratio Correction.
@@ -166,8 +166,8 @@ Win32DisplayBufferInWindow(HDC DeviceContext, int WindowWidth, int WindowHeight,
 		//X, Y, Width, Height,
 		// X, Y, Width, Height,
 		0, 0, WindowWidth, WindowHeight,
-		0, 0, Buffer.Width, Buffer.Height,
-		Buffer.Memory, &Buffer.Info, DIB_RGB_COLORS, SRCCOPY);
+		0, 0, Buffer->Width, Buffer->Height,
+		Buffer->Memory, &Buffer->Info, DIB_RGB_COLORS, SRCCOPY);
 }
 
 
@@ -192,7 +192,7 @@ LRESULT CALLBACK Win32MainWindowCallback(HWND hWnd, UINT Msg, WPARAM wParam, LPA
 		
 		win32_window_dimension Dimension = Win32GetWindowDimension(hWnd);
 
-		Win32DisplayBufferInWindow(DeviceContext, Dimension.Width, Dimension.Height, GlobalBackBuffer);
+		Win32DisplayBufferInWindow(&GlobalBackBuffer, DeviceContext, Dimension.Width, Dimension.Height);
 
 		EndPaint(hWnd, &paint);
 	} break;
@@ -387,11 +387,11 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 						// Controller is not connected
 					}
 				}
-				RenderWeirdGradient(GlobalBackBuffer, XOffset, YOffset);
+				RenderWeirdGradient(&GlobalBackBuffer, XOffset, YOffset);
 
 				win32_window_dimension Dimension = Win32GetWindowDimension(Window);
 
-				Win32DisplayBufferInWindow(DeviceContext, Dimension.Width, Dimension.Height, GlobalBackBuffer);
+				Win32DisplayBufferInWindow(&GlobalBackBuffer, DeviceContext, Dimension.Width, Dimension.Height);
 
 				ReleaseDC(Window, DeviceContext);
 
