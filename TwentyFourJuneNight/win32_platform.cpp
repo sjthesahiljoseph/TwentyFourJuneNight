@@ -70,7 +70,14 @@ global_variable x_input_set_state* XInputSetState_ = XInputSetStateStub;
 internal void
 Win32LoadXInput(void)
 {
-	HMODULE XInputLibrary = LoadLibraryA("xinput1_3.dll");
+
+	// TODO(SJtheSahilJoseph): Test this on Windows 8 stuff.
+	HMODULE XInputLibrary = LoadLibraryA("xinput1_4.dll");
+
+	if (!XInputLibrary)
+	{
+		XInputLibrary = LoadLibraryA("xinput1_3.dll");
+	}
 
 	if (XInputLibrary)
 	{
