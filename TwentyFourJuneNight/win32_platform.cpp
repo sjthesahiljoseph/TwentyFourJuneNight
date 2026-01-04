@@ -277,19 +277,16 @@ LRESULT CALLBACK Win32MainWindowCallback(HWND hWnd, UINT Msg, WPARAM wParam, LPA
 				Running = false;
 			}
 		}
-
-
-		//bool32 AltKeyWasDown = (lParam & (1 << 29));
-		// TODO(SJtheSahilJoseph): Where we should place the bool32 AltKeyWasDown Variable stuff?
-		// Now I'm using the hardcode.
-		else if ((VKeyCode == VK_F4) && (VKeyCode == ((lParam & (1 << 29) != 0))))
-		{
-				Running = false;
-		}
-
+		
 		else if (VKeyCode == VK_SPACE)
 		{
 			
+		}
+
+		bool32 AltKeyWasDown = (lParam & (1 << 29));
+		if ((VKeyCode == VK_F4) && AltKeyWasDown)
+		{
+			Running = false;
 		}
 
 	} break;
