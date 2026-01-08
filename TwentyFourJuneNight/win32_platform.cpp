@@ -457,6 +457,7 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 			// TODO(SJtheSahilJoseph): Sound Test
 			int SamplesPerSecond = 48000;
 			int ToneHz = 256;
+			int16 ToneVolume = 2000;
 			uint32 RunningSampleIndex = 0;
 			int SquareWaveCounter = 0;
 			int SquareWavePeriod = SamplesPerSecond / ToneHz;
@@ -563,7 +564,7 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 
 						for (DWORD SampleIndex = 0; SampleIndex < Region1SampleCount; SampleIndex++)
 						{
-							int16 SampleValue = (RunningSampleIndex++ / (HalfSquareWavePeriod) % 2) ? 16000 : -16000;
+							int16 SampleValue = (RunningSampleIndex++ / (HalfSquareWavePeriod) % 2) ? ToneVolume : -ToneVolume;
 
 							*SampleOut++ = SampleValue;
 							*SampleOut++ = SampleValue;
@@ -574,11 +575,14 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 
 						for (DWORD SampleIndex = 0; SampleIndex < Region2SampleCount; SampleIndex++)
 						{
-							int16 SampleValue = (RunningSampleIndex++ / (HalfSquareWavePeriod) % 2) ? 16000 : -16000;
+							int16 SampleValue = (RunningSampleIndex++ / (HalfSquareWavePeriod) % 2) ? ToneVolume : -ToneVolume;
 
 							*SampleOut++ = SampleValue;
 							*SampleOut++ = SampleValue;
 						}
+
+						GlobalSecondaryBuffer->Unlock(Region1, Region1Size, Region2, Region2Size);
+
 					}
 
 				}
