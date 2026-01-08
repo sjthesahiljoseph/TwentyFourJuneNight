@@ -44,6 +44,8 @@ global_variable win32_offscreen_buffer GlobalBackBuffer;
 global_variable int XOffset;
 global_variable int YOffset;
 
+global_variable LPDIRECTSOUNDBUFFER GlobalSecondaryBuffer;
+
 struct win32_window_dimension
 {
 	int Width;
@@ -167,9 +169,8 @@ Win32InitDSound(HWND Window, int32 SamplesPerSecond, int32 BufferSize)
 			BufferDescription.dwBufferBytes = BufferSize;
 			BufferDescription.lpwfxFormat = &WavFormat;
 			
-			LPDIRECTSOUNDBUFFER SecondaryBuffer;
 
-			if (SUCCEEDED(DirectSound->CreateSoundBuffer(&BufferDescription, &SecondaryBuffer, 0)))
+			if (SUCCEEDED(DirectSound->CreateSoundBuffer(&BufferDescription, &GlobalSecondaryBuffer, 0)))
 			{
 		
 				// NOTE(SJtheSahilJoseph): Start it playing.
