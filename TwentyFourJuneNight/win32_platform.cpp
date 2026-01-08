@@ -120,10 +120,11 @@ Win32InitDSound(HWND Window, int32 SamplesPerSecond, int32 BufferSize)
 			WavFormat.wFormatTag = WAVE_FORMAT_PCM;
 			WavFormat.nChannels = 2;
 			WavFormat.nSamplesPerSec = SamplesPerSecond;
+			WavFormat.wBitsPerSample = 16;
 			WavFormat.nBlockAlign = (WavFormat.nChannels * WavFormat.wBitsPerSample) / 8;
 			WavFormat.nAvgBytesPerSec = WavFormat.nSamplesPerSec * WavFormat.nBlockAlign;
-			WavFormat.wBitsPerSample = 16;
 			WavFormat.cbSize = 0;
+
 
 			if (!SUCCEEDED(DirectSound->SetCooperativeLevel(Window, DSSCL_PRIORITY)))
 			{
