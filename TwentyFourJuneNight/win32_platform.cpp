@@ -464,6 +464,7 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 			int SecondaryBufferSize = SamplesPerSecond * BytesPerSample;
 
 			Win32InitDSound(Window, SamplesPerSecond, SecondaryBufferSize);
+			GlobalSecondaryBuffer->Play(0, 0, DSBPLAY_LOOPING);
 
 			while (Running)
 			{
@@ -556,24 +557,23 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 
 						// TODO(SJtheSahilJoseph): Assert that Region1Size/Region2Size is valid.
 
-						int16* SampleOut = (int16*)Region1;
-
 						DWORD Region1SampleCount = Region1Size / BytesPerSample;
-						DWORD Region2SampleCount = Region2Size / BytesPerSample;
+						int16* SampleOut = (int16*)Region1;
 
 						for (DWORD SampleIndex = 0; SampleIndex < Region1SampleCount; SampleIndex++)
 						{
-							int16 SampleValue = (RunningSampleIndex / (HalfSquareWavePeriod) % 2) ? 16000 : -16000;
+							int16 SampleValue = (RunningSampleIndex++ / (HalfSquareWavePeriod) % 2) ? 16000 : -16000;
 
 							*SampleOut++ = SampleValue;
 							*SampleOut++ = SampleValue;
 						}
 						
 						SampleOut = (int16*)Region2;
+						DWORD Region2SampleCount = Region2Size / BytesPerSample;
 
 						for (DWORD SampleIndex = 0; SampleIndex < Region2SampleCount; SampleIndex++)
 						{
-							int16 SampleValue = (RunningSampleIndex / (HalfSquareWavePeriod) % 2) ? 16000 : -16000;
+							int16 SampleValue = (RunningSampleIndex++ / (HalfSquareWavePeriod) % 2) ? 16000 : -16000;
 
 							*SampleOut++ = SampleValue;
 							*SampleOut++ = SampleValue;
