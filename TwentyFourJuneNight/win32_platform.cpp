@@ -91,8 +91,8 @@ Win32LoadXInput(void)
 
 	if (XInputLibrary)
 	{
-		XInputGetState = (x_input_get_state *)GetProcAddress(XInputLibrary, "XInputGetState");
-		XInputSetState = (x_input_set_state * )GetProcAddress(XInputLibrary, "XInputSetState");
+		XInputGetState = (x_input_get_state*)GetProcAddress(XInputLibrary, "XInputGetState");
+		XInputSetState = (x_input_set_state*)GetProcAddress(XInputLibrary, "XInputSetState");
 	}
 
 }
@@ -137,7 +137,7 @@ Win32InitDSound(HWND Window, int32 SamplesPerSecond, int32 BufferSize)
 				if (SUCCEEDED(DirectSound->CreateSoundBuffer(&BufferDescription, &PrimaryBuffer, 0)))
 				{
 
-					
+
 					if (SUCCEEDED(PrimaryBuffer->SetFormat(&WavFormat)))
 					{
 						// NOTE(SJtheSahilJoseph): Now we have finally set the format.
@@ -159,7 +159,7 @@ Win32InitDSound(HWND Window, int32 SamplesPerSecond, int32 BufferSize)
 
 
 
-		// NOTE(SJtheSahilJoseph): Create a Secondary Buffer.
+			// NOTE(SJtheSahilJoseph): Create a Secondary Buffer.
 
 
 
@@ -168,11 +168,11 @@ Win32InitDSound(HWND Window, int32 SamplesPerSecond, int32 BufferSize)
 			BufferDescription.dwSize = sizeof(BufferDescription);
 			BufferDescription.dwBufferBytes = BufferSize;
 			BufferDescription.lpwfxFormat = &WavFormat;
-			
+
 
 			if (SUCCEEDED(DirectSound->CreateSoundBuffer(&BufferDescription, &GlobalSecondaryBuffer, 0)))
 			{
-		
+
 				// NOTE(SJtheSahilJoseph): Start it playing.
 
 
@@ -254,7 +254,7 @@ internal void Win32ResizeDIBSection(win32_offscreen_buffer* Buffer, int Width, i
 
 	int BitmapMemorySize = ((Buffer->Width * Buffer->Height) * Buffer->BytesPerPixel);
 
-	Buffer->Memory = VirtualAlloc(0, BitmapMemorySize, MEM_RESERVE|MEM_COMMIT, PAGE_READWRITE);
+	Buffer->Memory = VirtualAlloc(0, BitmapMemorySize, MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE);
 
 
 	// TODO(SJtheSahilJoseph): Probably wanna clear this to black.
@@ -272,7 +272,7 @@ Win32DisplayBufferInWindow(win32_offscreen_buffer* Buffer, HDC DeviceContext, in
 	// TODO(SJtheSahilJoseph): Aspect Ratio Correction.
 	// TODO(SJtheSahilJoseph): Experiment with Stretch Modes.
 
-	StretchDIBits(DeviceContext, 
+	StretchDIBits(DeviceContext,
 		//X, Y, Width, Height,
 		// X, Y, Width, Height,
 		0, 0, WindowWidth, WindowHeight,
@@ -299,7 +299,7 @@ LRESULT CALLBACK Win32MainWindowCallback(HWND hWnd, UINT Msg, WPARAM wParam, LPA
 		PAINTSTRUCT paint;
 
 		HDC DeviceContext = BeginPaint(hWnd, &paint);
-		
+
 		win32_window_dimension Dimension = Win32GetWindowDimension(hWnd);
 
 		Win32DisplayBufferInWindow(&GlobalBackBuffer, DeviceContext, Dimension.Width, Dimension.Height);
@@ -330,36 +330,36 @@ LRESULT CALLBACK Win32MainWindowCallback(HWND hWnd, UINT Msg, WPARAM wParam, LPA
 				YOffset += 20;
 			}
 		}
-		
+
 		else if (VKeyCode == VK_DOWN)
 		{
 			if (IsDown) {
-			YOffset -= 20;
+				YOffset -= 20;
 			}
 		}
-		
+
 		else if (VKeyCode == VK_LEFT)
 		{
 			if (IsDown) {
-			XOffset += 20;
+				XOffset += 20;
 			}
 		}
-		
+
 		else if (VKeyCode == VK_RIGHT)
 		{
 			if (IsDown) {
-			XOffset -= 20;
+				XOffset -= 20;
 			}
 		}
-		
+
 		else if (VKeyCode == 'Q')
 		{
-			
+
 		}
-		
+
 		else if (VKeyCode == 'E')
 		{
-			
+
 		}
 
 		else if (VKeyCode == VK_ESCAPE)
@@ -374,10 +374,10 @@ LRESULT CALLBACK Win32MainWindowCallback(HWND hWnd, UINT Msg, WPARAM wParam, LPA
 				Running = false;
 			}
 		}
-		
+
 		else if (VKeyCode == VK_SPACE)
 		{
-			
+
 		}
 
 		bool32 AltKeyWasDown = (lParam & (1 << 29));
@@ -453,7 +453,13 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 			//int XOffset = 0;
 			//int YOffset = 0;
 
-			Win32InitDSound(Window, 48000, 48000*sizeof(int16)*2);
+			int SamplesPerSecond = 48000;
+			int Hz = 256;
+			int SquareWaveCounter = 0;
+			int SquareWavePeriod = SamplesPerSecond / Hz;
+			int BytesPerSample = (sizeof(int16) * 2);
+
+			Win32InitDSound(Window, SamplesPerSecond, SamplesPerSecond * BytesPerSample);
 
 			while (Running)
 			{
@@ -504,7 +510,7 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 						int16 StickRX = Pad->sThumbRX;
 						int16 StickRY = Pad->sThumbRY;
 
-						
+
 					}
 					else
 					{
@@ -512,6 +518,65 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 					}
 				}
 				RenderWeirdGradient(&GlobalBackBuffer, XOffset, YOffset);
+
+				// NOTE(SJtheSahilJoseph): DirectSound output test.
+
+				DWORD PlayCursor;
+				DWORD WriteCursor;
+
+				if (SUCCEEDED(GlobalSecondaryBuffer->GetCurrentPosition(&PlayCursor, &WriteCursor)))
+				{
+
+					DWORD WritePointer;
+					DWORD BytesToWrite;
+					VOID* Region1;
+					DWORD Region1Size;
+					VOID* Region2;
+					DWORD Region2Size;
+
+					if (SUCCEEDED(GlobalSecondaryBuffer->Lock(WritePointer, BytesToWrite, &Region1, &Region1Size, &Region2, &Region2Size, 0)))
+					{
+
+
+						// TODO(SJtheSahilJoseph): Assert that Region1Size/Region2Size is valid.
+
+						int16* SampleOut = (int16*)Region1;
+
+						DWORD Region1SampleCount = Region1Size / BytesPerSample;
+						DWORD Region2SampleCount = Region2Size / BytesPerSample;
+
+						for (DWORD SampleIndex = 0; SampleIndex < Region1SampleCount; SampleIndex++)
+						{
+							if (SquareWaveCounter)
+							{
+								SquareWaveCounter = SquareWavePeriod;
+							}
+
+							int16 SampleValue = (SquareWaveCounter > (SquareWavePeriod / 2)) ? 16000 : -16000;
+
+							*SampleOut++ = SampleValue;
+							*SampleOut++ = SampleValue;
+
+							SquareWaveCounter--;
+						}
+
+						for (DWORD SampleIndex = 0; SampleIndex < Region2SampleCount; SampleIndex++)
+						{
+							if (SquareWaveCounter)
+							{
+								SquareWaveCounter = SquareWavePeriod;
+							}
+
+							int16 SampleValue = (SquareWaveCounter > (SquareWavePeriod / 2)) ? 16000 : -16000;
+
+							*SampleOut++ = SampleValue;
+							*SampleOut++ = SampleValue;
+
+							SquareWaveCounter--;
+						}
+					}
+
+				}
 
 				win32_window_dimension Dimension = Win32GetWindowDimension(Window);
 
