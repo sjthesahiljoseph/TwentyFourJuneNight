@@ -541,7 +541,7 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 				if (!SoundIsPlaying && SUCCEEDED(GlobalSecondaryBuffer->GetCurrentPosition(&PlayCursor, &WriteCursor)))
 				{
 					
-					DWORD BytesToLock = RunningSampleIndex * BytesPerSample % SecondaryBufferSize;
+					DWORD BytesToLock = (RunningSampleIndex * BytesPerSample) % SecondaryBufferSize;
 					DWORD BytesToWrite;
 
 					if (BytesToLock == PlayCursor)
