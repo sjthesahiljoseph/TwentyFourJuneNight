@@ -546,7 +546,9 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 
 					if (BytesToLock == PlayCursor)
 					{
-						BytesToWrite = SecondaryBufferSize;
+						if (!SoundIsPlaying) {
+							BytesToWrite = SecondaryBufferSize;
+						}
 					}
 					else if (BytesToLock > PlayCursor)
 					{
