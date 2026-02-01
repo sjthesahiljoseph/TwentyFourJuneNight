@@ -3,6 +3,8 @@
 #include <stdint.h>
 #include <xinput.h>
 #include <dsound.h>
+
+// TODO(SJtheSahilJoseph): Implement Sine ourselves.
 #include <math.h>
 
 #define internal static
