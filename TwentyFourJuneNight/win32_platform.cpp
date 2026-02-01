@@ -603,18 +603,18 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 				if (!SoundIsPlaying && SUCCEEDED(GlobalSecondaryBuffer->GetCurrentPosition(&PlayCursor, &WriteCursor)))
 				{
 
-					DWORD BytesToLock = (RunningSampleIndex * BytesPerSample) % SecondaryBufferSize;
+					DWORD BytesToLock = (SoundOutput.RunningSampleIndex * SoundOutput.BytesPerSample) % SoundOutput.SecondaryBufferSize;
 					DWORD BytesToWrite;
 
 					if (BytesToLock == PlayCursor)
 					{
 						if (!SoundIsPlaying) {
-							BytesToWrite = SecondaryBufferSize;
+							BytesToWrite = SoundOutput.SecondaryBufferSize;
 						}
 					}
 					else if (BytesToLock > PlayCursor)
 					{
-						BytesToWrite = (SecondaryBufferSize - BytesToLock);
+						BytesToWrite = (SoundOutput.SecondaryBufferSize - BytesToLock);
 						BytesToWrite += PlayCursor;
 					}
 					else
@@ -622,7 +622,7 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 						BytesToWrite = PlayCursor - BytesToLock;
 					}
 
-
+					Win32FillSoundBuffer(&SoundOutput, BytesToLock, BytesToWrite);
 				}
 
 				if (!SoundIsPlaying)
