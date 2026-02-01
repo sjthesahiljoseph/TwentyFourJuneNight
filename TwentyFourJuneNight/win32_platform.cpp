@@ -417,6 +417,19 @@ LRESULT CALLBACK Win32MainWindowCallback(HWND hWnd, UINT Msg, WPARAM wParam, LPA
 	return result;
 }
 
+struct win32_sound_output
+{
+	int SamplesPerSecond;
+	int ToneHz;
+	int16 ToneVolume;
+	uint32 RunningSampleIndex;
+	int WaveCounter;
+	int WavePeriod;
+	int BytesPerSample;
+	int SecondaryBufferSize;
+};
+
+
 int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd)
 {
 
@@ -460,16 +473,18 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 			//int XOffset = 0;
 			//int YOffset = 0;
 
-			// TODO(SJtheSahilJoseph): Sound Test
-			int SamplesPerSecond = 48000;
-			int ToneHz = 256;
-			int16 ToneVolume = 2000;
-			uint32 RunningSampleIndex = 0;
-			int WaveCounter = 0;
-			int WavePeriod = SamplesPerSecond / ToneHz;
-			//int HalfWavePeriod = WavePeriod / 2;
-			int BytesPerSample = (sizeof(int16) * 2);
-			int SecondaryBufferSize = SamplesPerSecond * BytesPerSample;
+
+			win32_sound_output SoundOutput = {};
+
+			SoundOutput.SamplesPerSecond = 48000;
+			SoundOutput.ToneHz = 256;
+			SoundOutput.ToneVolume = 2000;
+			SoundOutput.RunningSampleIndex = 0;
+			SoundOutput.WaveCounter = 0;
+			SoundOutput.WavePeriod = SoundOutput.SamplesPerSecond / SoundOutput.ToneHz;
+			SoundOutput.BytesPerSample = (sizeof(int16) * 2);
+			SoundOutput.SecondaryBufferSize = SoundOutput.SamplesPerSecond * SoundOutput.BytesPerSample;
+
 
 			Win32InitDSound(Window, SamplesPerSecond, SecondaryBufferSize);
 
@@ -540,7 +555,7 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 
 				if (!SoundIsPlaying && SUCCEEDED(GlobalSecondaryBuffer->GetCurrentPosition(&PlayCursor, &WriteCursor)))
 				{
-					
+
 					DWORD BytesToLock = (RunningSampleIndex * BytesPerSample) % SecondaryBufferSize;
 					DWORD BytesToWrite;
 
@@ -577,22 +592,22 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 
 						for (DWORD SampleIndex = 0; SampleIndex < Region1SampleCount; SampleIndex++)
 						{
-							real32 t = (real32)2.0f*PI32*(real32)RunningSampleIndex / (real32)WavePeriod;
+							real32 t = (real32)2.0f * PI32 * (real32)RunningSampleIndex / (real32)WavePeriod;
 							real32 SineValue = sinf(t);
-							
+
 							int16 SampleValue = (int16)(SineValue * ToneVolume);
 
 							*SampleOut++ = SampleValue;
 							*SampleOut++ = SampleValue;
 							RunningSampleIndex++;
 						}
-						
+
 						SampleOut = (int16*)Region2;
 						DWORD Region2SampleCount = Region2Size / BytesPerSample;
 
 						for (DWORD SampleIndex = 0; SampleIndex < Region2SampleCount; SampleIndex++)
 						{
-							real32 t = (real32)2.0f*PI32*(real32)RunningSampleIndex / (real32)WavePeriod;
+							real32 t = (real32)2.0f * PI32 * (real32)RunningSampleIndex / (real32)WavePeriod;
 							real32 SineValue = sinf(t);
 
 							int16 SampleValue = (int16)(SineValue * ToneVolume);
