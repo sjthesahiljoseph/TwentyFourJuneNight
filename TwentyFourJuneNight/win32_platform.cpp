@@ -535,7 +535,9 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 
 			Win32InitDSound(Window, SoundOutput.SamplesPerSecond, SoundOutput.SecondaryBufferSize);
 
-			bool32 SoundIsPlaying = false;
+			Win32FillSoundBuffer(&SoundOutput, 0, SoundOutput.SecondaryBufferSize);
+
+			GlobalSecondaryBuffer->Play(0, 0, DSBPLAY_LOOPING);
 
 			while (Running)
 			{
@@ -600,7 +602,7 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 				DWORD PlayCursor;
 				DWORD WriteCursor;
 
-				if (!SoundIsPlaying && SUCCEEDED(GlobalSecondaryBuffer->GetCurrentPosition(&PlayCursor, &WriteCursor)))
+				if (SUCCEEDED(GlobalSecondaryBuffer->GetCurrentPosition(&PlayCursor, &WriteCursor)))
 				{
 
 					DWORD BytesToLock = (SoundOutput.RunningSampleIndex * SoundOutput.BytesPerSample) % SoundOutput.SecondaryBufferSize;
@@ -608,9 +610,7 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 
 					if (BytesToLock == PlayCursor)
 					{
-						if (!SoundIsPlaying) {
-							BytesToWrite = SoundOutput.SecondaryBufferSize;
-						}
+						BytesToWrite = 0;
 					}
 					else if (BytesToLock > PlayCursor)
 					{
@@ -623,12 +623,7 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 					}
 
 					Win32FillSoundBuffer(&SoundOutput, BytesToLock, BytesToWrite);
-				}
 
-				if (!SoundIsPlaying)
-				{
-					GlobalSecondaryBuffer->Play(0, 0, DSBPLAY_LOOPING);
-					SoundIsPlaying = true;
 				}
 
 				win32_window_dimension Dimension = Win32GetWindowDimension(Window);
