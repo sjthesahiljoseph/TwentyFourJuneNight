@@ -429,6 +429,7 @@ struct win32_sound_output
 	int WavePeriod;
 	int BytesPerSample;
 	int SecondaryBufferSize;
+	real32 tSine;
 };
 
 internal void Win32FillSoundBuffer(win32_sound_output* SoundOutput, DWORD BytesToLock, DWORD BytesToWrite)
@@ -451,13 +452,15 @@ internal void Win32FillSoundBuffer(win32_sound_output* SoundOutput, DWORD BytesT
 
 		for (DWORD SampleIndex = 0; SampleIndex < Region1SampleCount; SampleIndex++)
 		{
-			real32 t = (real32)2.0f * PI32 * (real32)SoundOutput->RunningSampleIndex / (real32)SoundOutput->WavePeriod;
-			real32 SineValue = sinf(t);
+			real32 SineValue = sinf(SoundOutput->tSine);
 
 			int16 SampleValue = (int16)(SineValue * SoundOutput->ToneVolume);
 
 			*SampleOut++ = SampleValue;
 			*SampleOut++ = SampleValue;
+			
+			SoundOutput->tSine += (real32)2.0f * PI32 * (real32)1.0f / (real32)SoundOutput->WavePeriod;
+			
 			SoundOutput->RunningSampleIndex++;
 		}
 
@@ -466,13 +469,15 @@ internal void Win32FillSoundBuffer(win32_sound_output* SoundOutput, DWORD BytesT
 
 		for (DWORD SampleIndex = 0; SampleIndex < Region2SampleCount; SampleIndex++)
 		{
-			real32 t = (real32)2.0f * PI32 * (real32)SoundOutput->RunningSampleIndex / (real32)SoundOutput->WavePeriod;
-			real32 SineValue = sinf(t);
+			real32 SineValue = sinf(SoundOutput->tSine);
 
 			int16 SampleValue = (int16)(SineValue * SoundOutput->ToneVolume);
 
 			*SampleOut++ = SampleValue;
 			*SampleOut++ = SampleValue;
+
+			SoundOutput->tSine += (real32)2.0f * PI32 * (real32)1.0f / (real32)SoundOutput->WavePeriod;
+
 			SoundOutput->RunningSampleIndex++;
 		}
 
