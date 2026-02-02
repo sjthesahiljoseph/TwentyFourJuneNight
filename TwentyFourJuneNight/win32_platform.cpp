@@ -526,6 +526,7 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 
 			win32_sound_output SoundOutput = {};
 
+			// TODO(SJtheSahilJoseph): Make this like 60 seconds?
 			SoundOutput.SamplesPerSecond = 48000;
 			SoundOutput.ToneHz = 256;
 			SoundOutput.ToneVolume = 2000;
