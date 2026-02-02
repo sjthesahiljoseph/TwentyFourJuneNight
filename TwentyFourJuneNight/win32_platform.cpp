@@ -618,7 +618,7 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 					DWORD BytesToLock = (SoundOutput.RunningSampleIndex * SoundOutput.BytesPerSample) % SoundOutput.SecondaryBufferSize;
 					DWORD BytesToWrite;
 
-					DWORD TargetCursor = PlayCursor + (SoundOutput.LatencySampleCount * SoundOutput.BytesPerSample);
+					DWORD TargetCursor = ((PlayCursor + (SoundOutput.LatencySampleCount * SoundOutput.BytesPerSample)) % SoundOutput.SecondaryBufferSize);
 
 					// TODO(SJtheSahilJoseph): Change this to using a lower latency offset from the play cursor when we actually start having sound effects.
 					if (BytesToLock > TargetCursor)
