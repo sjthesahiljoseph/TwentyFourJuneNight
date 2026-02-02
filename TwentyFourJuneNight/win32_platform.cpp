@@ -430,6 +430,7 @@ struct win32_sound_output
 	int BytesPerSample;
 	int SecondaryBufferSize;
 	real32 tSine;
+	int LatencySampleCount;
 };
 
 internal void Win32FillSoundBuffer(win32_sound_output* SoundOutput, DWORD BytesToLock, DWORD BytesToWrite)
@@ -540,10 +541,11 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 			SoundOutput.WavePeriod = SoundOutput.SamplesPerSecond / SoundOutput.ToneHz;
 			SoundOutput.BytesPerSample = (sizeof(int16) * 2);
 			SoundOutput.SecondaryBufferSize = SoundOutput.SamplesPerSecond * SoundOutput.BytesPerSample;
+			SoundOutput.LatencySampleCount = SoundOutput.SamplesPerSecond / 15;
 
 			Win32InitDSound(Window, SoundOutput.SamplesPerSecond, SoundOutput.SecondaryBufferSize);
 
-			Win32FillSoundBuffer(&SoundOutput, 0, SoundOutput.SecondaryBufferSize);
+			Win32FillSoundBuffer(&SoundOutput, 0, SoundOutput.LatencySampleCount * SoundOutput.SamplesPerSecond);
 
 			GlobalSecondaryBuffer->Play(0, 0, DSBPLAY_LOOPING);
 
@@ -616,15 +618,17 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 					DWORD BytesToLock = (SoundOutput.RunningSampleIndex * SoundOutput.BytesPerSample) % SoundOutput.SecondaryBufferSize;
 					DWORD BytesToWrite;
 
+					DWORD TargetCursor = PlayCursor + (SoundOutput.LatencySampleCount * SoundOutput.BytesPerSample);
+
 					// TODO(SJtheSahilJoseph): Change this to using a lower latency offset from the play cursor when we actually start having sound effects.
-					if (BytesToLock > PlayCursor)
+					if (BytesToLock > TargetCursor)
 					{
 						BytesToWrite = (SoundOutput.SecondaryBufferSize - BytesToLock);
-						BytesToWrite += PlayCursor;
+						BytesToWrite += TargetCursor;
 					}
 					else
 					{
-						BytesToWrite = PlayCursor - BytesToLock;
+						BytesToWrite = TargetCursor - BytesToLock;
 					}
 
 					Win32FillSoundBuffer(&SoundOutput, BytesToLock, BytesToWrite);
