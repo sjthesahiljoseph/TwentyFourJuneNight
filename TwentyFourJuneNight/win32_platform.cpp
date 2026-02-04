@@ -1,11 +1,10 @@
 
-#include <windows.h>
-#include <stdint.h>
-#include <xinput.h>
+#include <cstdint>
 #include <dsound.h>
-
+#include <xinput.h>
 // TODO(SJtheSahilJoseph): Implement Sine ourselves.
-#include <math.h>
+#include <cmath>
+#include <windows.h>
 
 #define internal static
 #define local_persist static
